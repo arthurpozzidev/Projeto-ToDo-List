@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <!-- ============================================================
+         META TAGS - Configurações básicas do documento HTML
+         ============================================================ -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ToDo List Inteligente - Gerencie suas tarefas com backend Node.js e banco de dados JSON">
+    
+    <title>ToDo List Inteligente ✨</title>
+
+    <!-- Fonte Inter do Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+
+        <!-- HEADER -->
+        <header class="app-header">
+            <div class="header-top">
+                <h1>
+                    <span class="logo-icon">✅</span>
+                    ToDo List
+                    <span class="logo-accent">Inteligente</span>
+                </h1>
+                <p class="current-date" id="currentDate"></p>
+            </div>
+
+            <!-- ESTATÍSTICAS -->
+            <div class="stats-bar">
+                <div class="stat-card" id="statTotal">
+                    <span class="stat-number">0</span>
+                    <span class="stat-label">Total</span>
+                </div>
+                <div class="stat-card stat-pending" id="statPending">
+                    <span class="stat-number">0</span>
+                    <span class="stat-label">Pendentes</span>
+                </div>
+                <div class="stat-card stat-completed" id="statCompleted">
+                    <span class="stat-number">0</span>
+                    <span class="stat-label">Concluídas</span>
+                </div>
+                <div class="stat-card stat-urgent" id="statUrgent">
+                    <span class="stat-number">0</span>
+                    <span class="stat-label">Urgentes</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- FORMULÁRIO DE NOVA TAREFA -->
+        <section class="add-task-section">
+            <h2 class="section-title">
+                <span>➕</span> Nova Tarefa
+            </h2>
+            <form id="taskForm" class="task-form">
+                <div class="form-row">
+                    <div class="form-group form-group-title">
+                        <label for="taskTitle">Título da Tarefa *</label>
+                        <input type="text" id="taskTitle" placeholder="O que você precisa fazer?" required maxlength="100">
+                    </div>
+                </div>
+
+                <div class="form-row form-row-options">
+                    <div class="form-group">
+                        <label for="taskCategory">Categoria</label>
+                        <select id="taskCategory">
+                            <option value="pessoal">🏠 Pessoal</option>
+                            <option value="trabalho">💼 Trabalho</option>
+                            <option value="estudos">📚 Estudos</option>
+                            <option value="saude">💪 Saúde</option>
+                            <option value="financas">💰 Finanças</option>
+                            <option value="outros">📌 Outros</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="taskPriority">Prioridade</label>
+                        <select id="taskPriority">
+                            <option value="baixa">🟢 Baixa</option>
+                            <option value="media" selected>🟡 Média</option>
+                            <option value="alta">🔴 Alta</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="taskDate">Prazo</label>
+                        <input type="date" id="taskDate">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group form-group-title">
+                        <label for="taskDescription">Descrição (opcional)</label>
+                        <textarea id="taskDescription" placeholder="Adicione detalhes sobre esta tarefa..." rows="2" maxlength="300"></textarea>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-add" id="btnSubmit">
+                    <span class="btn-icon">➕</span>
+                    <span class="btn-text">Adicionar Tarefa</span>
+                </button>
+            </form>
+        </section>
+
+        <!-- BARRA DE FILTROS E PESQUISA -->
+        <section class="controls-section">
+            <div class="search-bar">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchInput" placeholder="Buscar tarefas...">
+            </div>
+            <div class="filter-group">
+                <button class="filter-btn active" data-filter="todas" id="filterAll">Todas</button>
+                <button class="filter-btn" data-filter="pendentes" id="filterPending">Pendentes</button>
+                <button class="filter-btn" data-filter="concluidas" id="filterCompleted">Concluídas</button>
+            </div>
+            <div class="sort-group">
+                <label for="sortSelect">Ordenar:</label>
+                <select id="sortSelect">
+                    <option value="recentes">Mais Recentes</option>
+                    <option value="antigas">Mais Antigas</option>
+                    <option value="prioridade">Prioridade</option>
+                    <option value="prazo">Prazo</option>
+                    <option value="alfabetica">A-Z</option>
+                </select>
+            </div>
+        </section>
+
+        <!-- LISTA DE TAREFAS -->
+        <section class="tasks-section">
+            <div class="tasks-list" id="tasksList">
+                <div class="empty-state" id="emptyState">
+                    <div class="empty-icon">📋</div>
+                    <h3>Nenhuma tarefa encontrada</h3>
+                    <p>Comece adicionando sua primeira tarefa acima!</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- BOTÃO LIMPAR CONCLUÍDAS -->
+        <div class="actions-bar" id="actionsBar" style="display: none;">
+            <button class="btn-clear" id="btnClearCompleted">
+                🗑️ Limpar Concluídas
+            </button>
+        </div>
+
+        <!-- ==========================================================
+             SEÇÃO DE GERENCIAMENTO DO BANCO DE DADOS JSON
+             Mostra informações do db.json e permite exportar/importar
+             ========================================================== -->
+        <section class="data-management-section">
+            <h2 class="section-title">
+                <span>💾</span> Banco de Dados (db.json)
+            </h2>
+            <p class="data-description">
+                Os dados são salvos no arquivo <strong>db.json</strong> no servidor.
+                Exporte para fazer backup ou importe dados de outro dispositivo.
+            </p>
+
+            <div class="data-actions">
+                <button class="btn-data btn-export" id="btnExportJson">
+                    <span>📥</span> Exportar JSON
+                </button>
+                <button class="btn-data btn-import" id="btnImportJson">
+                    <span>📤</span> Importar JSON
+                </button>
+            </div>
+
+            <!-- Input oculto para importação de arquivo -->
+            <input type="file" id="fileInput" accept=".json" style="display: none;">
+
+            <!-- Indicador de status do servidor -->
+            <div class="save-indicator" id="saveIndicator">
+                <span class="save-dot"></span>
+                <span class="save-text" id="saveText">Conectado ao servidor</span>
+            </div>
+        </section>
+    </div>
+
+    <!-- MODAL DE EDIÇÃO -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>✏️ Editar Tarefa</h2>
+                <button class="modal-close" id="modalClose">&times;</button>
+            </div>
+            <form id="editForm" class="task-form">
+                <input type="hidden" id="editTaskId">
+                <div class="form-group">
+                    <label for="editTitle">Título</label>
+                    <input type="text" id="editTitle" required maxlength="100">
+                </div>
+                <div class="form-row form-row-options">
+                    <div class="form-group">
+                        <label for="editCategory">Categoria</label>
+                        <select id="editCategory">
+                            <option value="pessoal">🏠 Pessoal</option>
+                            <option value="trabalho">💼 Trabalho</option>
+                            <option value="estudos">📚 Estudos</option>
+                            <option value="saude">💪 Saúde</option>
+                            <option value="financas">💰 Finanças</option>
+                            <option value="outros">📌 Outros</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editPriority">Prioridade</label>
+                        <select id="editPriority">
+                            <option value="baixa">🟢 Baixa</option>
+                            <option value="media">🟡 Média</option>
+                            <option value="alta">🔴 Alta</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editDate">Prazo</label>
+                        <input type="date" id="editDate">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="editDescription">Descrição</label>
+                    <textarea id="editDescription" rows="3" maxlength="300"></textarea>
+                </div>
+                <button type="submit" class="btn-add">
+                    <span class="btn-icon">💾</span>
+                    <span class="btn-text">Salvar Alterações</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL DE CONFIRMAÇÃO DE EXCLUSÃO -->
+    <div class="modal-overlay" id="confirmModal">
+        <div class="modal-content modal-confirm">
+            <div class="confirm-icon">⚠️</div>
+            <h3>Tem certeza?</h3>
+            <p>Esta ação não pode ser desfeita.</p>
+            <div class="confirm-buttons">
+                <button class="btn-cancel" id="btnCancelDelete">Cancelar</button>
+                <button class="btn-delete-confirm" id="btnConfirmDelete">Excluir</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div class="toast" id="toast">
+        <span class="toast-icon" id="toastIcon">✅</span>
+        <span class="toast-message" id="toastMessage">Ação realizada!</span>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,34 @@
+{
+  "_comentario": "Este é o banco de dados JSON do ToDo List Inteligente. Cada objeto dentro do array 'tasks' representa uma tarefa.",
+  "metadata": {
+    "version": "1.0.0",
+    "appName": "ToDo List Inteligente",
+    "createdAt": "2026-04-02T00:00:00.000Z",
+    "lastModified": "2026-04-02T08:31:23.893Z",
+    "totalTasksCreated": 2
+  },
+  "tasks": [
+    {
+      "id": "mnh7tok3rijj5zgq4e",
+      "title": "Estudar JavaScript",
+      "category": "estudos",
+      "priority": "alta",
+      "dueDate": null,
+      "description": "",
+      "completed": false,
+      "createdAt": "2026-04-02T08:31:10.995Z",
+      "completedAt": null
+    },
+    {
+      "id": "mnh7tyidws83wjiv51i",
+      "title": "Fazer compras",
+      "category": "pessoal",
+      "priority": "media",
+      "dueDate": null,
+      "description": "",
+      "completed": false,
+      "createdAt": "2026-04-02T08:31:23.893Z",
+      "completedAt": null
+    }
+  ]
+}
