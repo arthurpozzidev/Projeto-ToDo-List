@@ -4,30 +4,19 @@
     "version": "1.0.0",
     "appName": "ToDo List Inteligente",
     "createdAt": "2026-04-02T00:00:00.000Z",
-    "lastModified": "2026-04-02T08:31:23.893Z",
-    "totalTasksCreated": 2
+    "lastModified": "2026-04-02T08:46:58.726Z",
+    "totalTasksCreated": 3
   },
   "tasks": [
     {
-      "id": "mnh7tok3rijj5zgq4e",
-      "title": "Estudar JavaScript",
-      "category": "estudos",
-      "priority": "alta",
-      "dueDate": null,
-      "description": "",
-      "completed": false,
-      "createdAt": "2026-04-02T08:31:10.995Z",
-      "completedAt": null
-    },
-    {
-      "id": "mnh7tyidws83wjiv51i",
-      "title": "Fazer compras",
+      "id": "mnh8dzty9qvrzdd8in9",
+      "title": "Programar um ToDo List",
       "category": "pessoal",
       "priority": "media",
       "dueDate": null,
       "description": "",
       "completed": false,
-      "createdAt": "2026-04-02T08:31:23.893Z",
+      "createdAt": "2026-04-02T08:46:58.726Z",
       "completedAt": null
     }
   ]

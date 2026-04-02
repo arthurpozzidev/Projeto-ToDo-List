@@ -587,6 +587,30 @@ class TodoApp {
                 e.target.value = '';
             }
         });
+
+        // ---- TOGGLE RECOLHER/EXPANDIR SEÇÃO "NOVA TAREFA" ----
+        /*
+           Quando o usuário clica no cabeçalho da seção,
+           alternamos a classe 'collapsed' no conteúdo e na seta.
+           
+           classList.toggle('classe') adiciona a classe se não existe,
+           ou remove se já existe. Perfeito para toggle!
+        */
+        document.getElementById('toggleNewTask').addEventListener('click', () => {
+            const content = document.getElementById('newTaskContent');
+            const chevron = document.getElementById('toggleChevron');
+            const toggle = document.getElementById('toggleNewTask');
+            
+            // Alterna a classe 'collapsed' no conteúdo (mostra/esconde)
+            content.classList.toggle('collapsed');
+            
+            // Alterna a rotação da seta
+            chevron.classList.toggle('collapsed');
+            
+            // Atualiza o atributo aria-expanded para acessibilidade
+            const isExpanded = !content.classList.contains('collapsed');
+            toggle.setAttribute('aria-expanded', isExpanded);
+        });
     }
 
 

@@ -54,55 +54,70 @@
 
         <!-- FORMULÁRIO DE NOVA TAREFA -->
         <section class="add-task-section">
-            <h2 class="section-title">
-                <span>➕</span> Nova Tarefa
-            </h2>
-            <form id="taskForm" class="task-form">
-                <div class="form-row">
-                    <div class="form-group form-group-title">
-                        <label for="taskTitle">Título da Tarefa *</label>
-                        <input type="text" id="taskTitle" placeholder="O que você precisa fazer?" required maxlength="100">
-                    </div>
-                </div>
+            <!-- 
+                TOGGLE HEADER - Clicável para recolher/expandir o formulário
+                O botão ocupa toda a largura e contém o título + seta indicadora
+            -->
+            <button class="section-toggle" id="toggleNewTask" aria-expanded="true" aria-controls="newTaskContent">
+                <h2 class="section-title">
+                    <span>➕</span> Nova Tarefa
+                </h2>
+                <!-- Seta que gira 180° ao expandir/recolher -->
+                <span class="toggle-chevron" id="toggleChevron">▼</span>
+            </button>
 
-                <div class="form-row form-row-options">
-                    <div class="form-group">
-                        <label for="taskCategory">Categoria</label>
-                        <select id="taskCategory">
-                            <option value="pessoal">🏠 Pessoal</option>
-                            <option value="trabalho">💼 Trabalho</option>
-                            <option value="estudos">📚 Estudos</option>
-                            <option value="saude">💪 Saúde</option>
-                            <option value="financas">💰 Finanças</option>
-                            <option value="outros">📌 Outros</option>
-                        </select>
+            <!-- 
+                WRAPPER COLAPSÁVEL - Envolve o formulário
+                A classe .collapsed esconde o conteúdo com animação suave
+            -->
+            <div class="collapsible-content" id="newTaskContent">
+                <form id="taskForm" class="task-form">
+                    <div class="form-row">
+                        <div class="form-group form-group-title">
+                            <label for="taskTitle">Título da Tarefa *</label>
+                            <input type="text" id="taskTitle" placeholder="O que você precisa fazer?" required maxlength="100">
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="taskPriority">Prioridade</label>
-                        <select id="taskPriority">
-                            <option value="baixa">🟢 Baixa</option>
-                            <option value="media" selected>🟡 Média</option>
-                            <option value="alta">🔴 Alta</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="taskDate">Prazo</label>
-                        <input type="date" id="taskDate">
-                    </div>
-                </div>
 
-                <div class="form-row">
-                    <div class="form-group form-group-title">
-                        <label for="taskDescription">Descrição (opcional)</label>
-                        <textarea id="taskDescription" placeholder="Adicione detalhes sobre esta tarefa..." rows="2" maxlength="300"></textarea>
+                    <div class="form-row form-row-options">
+                        <div class="form-group">
+                            <label for="taskCategory">Categoria</label>
+                            <select id="taskCategory">
+                                <option value="pessoal">🏠 Pessoal</option>
+                                <option value="trabalho">💼 Trabalho</option>
+                                <option value="estudos">📚 Estudos</option>
+                                <option value="saude">💪 Saúde</option>
+                                <option value="financas">💰 Finanças</option>
+                                <option value="outros">📌 Outros</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="taskPriority">Prioridade</label>
+                            <select id="taskPriority">
+                                <option value="baixa">🟢 Baixa</option>
+                                <option value="media" selected>🟡 Média</option>
+                                <option value="alta">🔴 Alta</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="taskDate">Prazo</label>
+                            <input type="date" id="taskDate">
+                        </div>
                     </div>
-                </div>
 
-                <button type="submit" class="btn-add" id="btnSubmit">
-                    <span class="btn-icon">➕</span>
-                    <span class="btn-text">Adicionar Tarefa</span>
-                </button>
-            </form>
+                    <div class="form-row">
+                        <div class="form-group form-group-title">
+                            <label for="taskDescription">Descrição (opcional)</label>
+                            <textarea id="taskDescription" placeholder="Adicione detalhes sobre esta tarefa..." rows="2" maxlength="300"></textarea>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-add" id="btnSubmit">
+                        <span class="btn-icon">➕</span>
+                        <span class="btn-text">Adicionar Tarefa</span>
+                    </button>
+                </form>
+            </div>
         </section>
 
         <!-- BARRA DE FILTROS E PESQUISA -->

@@ -187,10 +187,75 @@ body {
 .section-title {
     font-size: 1.1rem;
     font-weight: 700;
-    margin-bottom: 20px;
+    margin-bottom: 0;
     display: flex;
     align-items: center;
     gap: 8px;
+}
+
+/*
+   BOTÃO TOGGLE - Cabeçalho clicável para recolher/expandir seção
+   - Ocupa toda a largura da seção
+   - Sem fundo visível (parece um heading normal, mas é clicável)
+   - Cursor pointer indica interatividade
+*/
+.section-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    cursor: pointer;
+    padding: 0;
+    margin-bottom: 0;
+    transition: var(--transition-fast);
+}
+
+/* Hover: leve destaque para indicar que é clicável */
+.section-toggle:hover {
+    opacity: 0.85;
+}
+
+/*
+   CHEVRON (seta indicadora) ▼
+   - Rotaciona 180° quando o conteúdo está expandido
+   - Transição suave na rotação
+*/
+.toggle-chevron {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    transition: transform 0.3s ease;
+    display: flex;
+    align-items: center;
+}
+
+/* Quando recolhido, a seta aponta para a direita (rotação -90°) */
+.toggle-chevron.collapsed {
+    transform: rotate(-90deg);
+}
+
+/*
+   CONTEÚDO COLAPSÁVEL
+   - Usa max-height + overflow hidden para animar o colapso
+   - Quando expandido: max-height grande + opacity 1
+   - Quando recolhido: max-height 0 + opacity 0
+   - padding-top cria espaço entre o toggle e o conteúdo
+*/
+.collapsible-content {
+    max-height: 600px;
+    overflow: hidden;
+    opacity: 1;
+    transition: max-height 0.4s ease, opacity 0.3s ease, padding-top 0.3s ease;
+    padding-top: 20px;
+}
+
+/* Estado recolhido: esconde o conteúdo suavemente */
+.collapsible-content.collapsed {
+    max-height: 0;
+    opacity: 0;
+    padding-top: 0;
 }
 
 .task-form {
