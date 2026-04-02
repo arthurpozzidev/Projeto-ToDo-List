@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <!-- ============================================================
+         META TAGS - Configurações básicas do documento HTML
+         ============================================================ -->
+    <!-- Define a codificação de caracteres como UTF-8 (suporta acentos, emojis, etc.) -->
+    <meta charset="UTF-8">
+    <!-- Faz o site ser responsivo em dispositivos móveis -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Descrição do site para SEO (mecanismos de busca) -->
+    <meta name="description" content="ToDo List Inteligente - Gerencie suas tarefas com prioridades, categorias e filtros avançados">
+    
+    <!-- Título que aparece na aba do navegador -->
+    <title>ToDo List Inteligente ✨</title>
+
+    <!-- ============================================================
+         FONTES DO GOOGLE - Importamos fontes profissionais para o design
+         ============================================================ -->
+    <!-- 'Inter' é uma fonte moderna e legível, muito usada em interfaces -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- ============================================================
+         LINK PARA O CSS - Conecta nosso arquivo de estilos
+         ============================================================ -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- ============================================================
+         CONTAINER PRINCIPAL - Envolvê tudo em um container centralizado
+         ============================================================ -->
+    <div class="app-container">
+
+        <!-- ==========================================================
+             HEADER - Cabeçalho com título e estatísticas rápidas
+             ========================================================== -->
+        <header class="app-header">
+            <!-- Título principal do app com emoji decorativo -->
+            <div class="header-top">
+                <h1>
+                    <span class="logo-icon">✅</span>
+                    ToDo List
+                    <span class="logo-accent">Inteligente</span>
+                </h1>
+                <!-- Mostra a data atual formatada -->
+                <p class="current-date" id="currentDate"></p>
+            </div>
+
+            <!-- ==========================================================
+                 ESTATÍSTICAS - Cards mostrando resumo das tarefas
+                 Cada card mostra uma métrica diferente (total, concluídas, etc.)
+                 ========================================================== -->
+            <div class="stats-bar">
+                <!-- Card: Total de tarefas -->
+                <div class="stat-card" id="statTotal">
+                    <span class="stat-number">0</span>
+                    <span class="stat-label">Total</span>
+                </div>
+                <!-- Card: Tarefas pendentes -->
+                <div class="stat-card stat-pending" id="statPending">
+                    <span class="stat-number">0</span>
+                    <span class="stat-label">Pendentes</span>
+                </div>
+                <!-- Card: Tarefas concluídas -->
+                <div class="stat-card stat-completed" id="statCompleted">
+                    <span class="stat-number">0</span>
+                    <span class="stat-label">Concluídas</span>
+                </div>
+                <!-- Card: Tarefas de alta prioridade -->
+                <div class="stat-card stat-urgent" id="statUrgent">
+                    <span class="stat-number">0</span>
+                    <span class="stat-label">Urgentes</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- ==========================================================
+             FORMULÁRIO DE ADICIONAR TAREFA - Onde o usuário cria novas tarefas
+             ========================================================== -->
+        <section class="add-task-section">
+            <h2 class="section-title">
+                <span>➕</span> Nova Tarefa
+            </h2>
+
+            <!-- 
+                O formulário NÃO envia dados para um servidor (não tem action/method).
+                Em vez disso, o JavaScript intercepta o "submit" e trata os dados localmente.
+            -->
+            <form id="taskForm" class="task-form">
+                <!-- Campo principal: nome/título da tarefa -->
+                <div class="form-row">
+                    <div class="form-group form-group-title">
+                        <label for="taskTitle">Título da Tarefa *</label>
+                        <input 
+                            type="text" 
+                            id="taskTitle" 
+                            placeholder="O que você precisa fazer?" 
+                            required
+                            maxlength="100"
+                        >
+                    </div>
+                </div>
+
+                <!-- Segunda linha: Categoria, Prioridade e Data -->
+                <div class="form-row form-row-options">
+                    <!-- Seletor de Categoria -->
+                    <div class="form-group">
+                        <label for="taskCategory">Categoria</label>
+                        <select id="taskCategory">
+                            <option value="pessoal">🏠 Pessoal</option>
+                            <option value="trabalho">💼 Trabalho</option>
+                            <option value="estudos">📚 Estudos</option>
+                            <option value="saude">💪 Saúde</option>
+                            <option value="financas">💰 Finanças</option>
+                            <option value="outros">📌 Outros</option>
+                        </select>
+                    </div>
+
+                    <!-- Seletor de Prioridade -->
+                    <div class="form-group">
+                        <label for="taskPriority">Prioridade</label>
+                        <select id="taskPriority">
+                            <option value="baixa">🟢 Baixa</option>
+                            <option value="media" selected>🟡 Média</option>
+                            <option value="alta">🔴 Alta</option>
+                        </select>
+                    </div>
+
+                    <!-- Campo de Data (prazo da tarefa) -->
+                    <div class="form-group">
+                        <label for="taskDate">Prazo</label>
+                        <input type="date" id="taskDate">
+                    </div>
+                </div>
+
+                <!-- Campo de descrição opcional -->
+                <div class="form-row">
+                    <div class="form-group form-group-title">
+                        <label for="taskDescription">Descrição (opcional)</label>
+                        <textarea 
+                            id="taskDescription" 
+                            placeholder="Adicione detalhes sobre esta tarefa..."
+                            rows="2"
+                            maxlength="300"
+                        ></textarea>
+                    </div>
+                </div>
+
+                <!-- Botão de enviar o formulário -->
+                <button type="submit" class="btn-add" id="btnSubmit">
+                    <span class="btn-icon">➕</span>
+                    <span class="btn-text">Adicionar Tarefa</span>
+                </button>
+            </form>
+        </section>
+
+        <!-- ==========================================================
+             BARRA DE FILTROS E PESQUISA - Controles para filtrar/buscar tarefas
+             ========================================================== -->
+        <section class="controls-section">
+            <!-- Campo de busca por texto -->
+            <div class="search-bar">
+                <span class="search-icon">🔍</span>
+                <input 
+                    type="text" 
+                    id="searchInput" 
+                    placeholder="Buscar tarefas..."
+                >
+            </div>
+
+            <!-- Filtros por status (Todas, Pendentes, Concluídas) -->
+            <div class="filter-group">
+                <button class="filter-btn active" data-filter="todas" id="filterAll">
+                    Todas
+                </button>
+                <button class="filter-btn" data-filter="pendentes" id="filterPending">
+                    Pendentes
+                </button>
+                <button class="filter-btn" data-filter="concluidas" id="filterCompleted">
+                    Concluídas
+                </button>
+            </div>
+
+            <!-- Ordenação das tarefas -->
+            <div class="sort-group">
+                <label for="sortSelect">Ordenar:</label>
+                <select id="sortSelect">
+                    <option value="recentes">Mais Recentes</option>
+                    <option value="antigas">Mais Antigas</option>
+                    <option value="prioridade">Prioridade</option>
+                    <option value="prazo">Prazo</option>
+                    <option value="alfabetica">A-Z</option>
+                </select>
+            </div>
+        </section>
+
+        <!-- ==========================================================
+             LISTA DE TAREFAS - Container onde as tarefas serão renderizadas
+             O JavaScript vai inserir os cards de tarefas aqui dinamicamente
+             ========================================================== -->
+        <section class="tasks-section">
+            <div class="tasks-list" id="tasksList">
+                <!-- 
+                    Estado vazio: mostrado quando não há tarefas
+                    O JavaScript controla a visibilidade deste elemento
+                -->
+                <div class="empty-state" id="emptyState">
+                    <div class="empty-icon">📋</div>
+                    <h3>Nenhuma tarefa encontrada</h3>
+                    <p>Comece adicionando sua primeira tarefa acima!</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================================
+             BOTÃO LIMPAR CONCLUÍDAS - Remove todas as tarefas já concluídas
+             ========================================================== -->
+        <div class="actions-bar" id="actionsBar" style="display: none;">
+            <button class="btn-clear" id="btnClearCompleted">
+                🗑️ Limpar Concluídas
+            </button>
+        </div>
+
+        <!-- ==========================================================
+             SEÇÃO DE GERENCIAMENTO DE DADOS JSON
+             Permite exportar os dados como arquivo .json e importar de volta
+             Isso cria uma forma de BACKUP persistente fora do navegador
+             ========================================================== -->
+        <section class="data-management-section">
+            <h2 class="section-title">
+                <span>💾</span> Gerenciamento de Dados (JSON)
+            </h2>
+            <p class="data-description">
+                Seus dados são salvos automaticamente no navegador (localStorage).
+                Exporte como arquivo <strong>.json</strong> para fazer backup ou transferir para outro dispositivo.
+            </p>
+
+            <div class="data-actions">
+                <!-- Botão EXPORTAR: baixa um arquivo .json com todos os dados -->
+                <button class="btn-data btn-export" id="btnExportJson">
+                    <span>📥</span> Exportar JSON
+                </button>
+
+                <!-- Botão IMPORTAR: carrega dados de um arquivo .json -->
+                <button class="btn-data btn-import" id="btnImportJson">
+                    <span>📤</span> Importar JSON
+                </button>
+            </div>
+
+            <!-- 
+                Input FILE oculto - usado para selecionar o arquivo .json para importar
+                accept=".json" limita a seleção apenas a arquivos .json
+                O botão "Importar JSON" acima vai disparar o clique neste input
+            -->
+            <input 
+                type="file" 
+                id="fileInput" 
+                accept=".json" 
+                style="display: none;"
+            >
+
+            <!-- Indicador de último salvamento -->
+            <div class="save-indicator" id="saveIndicator">
+                <span class="save-dot"></span>
+                <span class="save-text" id="saveText">Dados sincronizados</span>
+            </div>
+        </section>
+    </div>
+
+    <!-- ==========================================================
+         MODAL DE EDIÇÃO - Popup para editar uma tarefa existente
+         Fica oculto por padrão e aparece quando o usuário clica em "Editar"
+         ========================================================== -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>✏️ Editar Tarefa</h2>
+                <!-- Botão de fechar o modal (X) -->
+                <button class="modal-close" id="modalClose">&times;</button>
+            </div>
+
+            <!-- Formulário de edição (mesmos campos do formulário principal) -->
+            <form id="editForm" class="task-form">
+                <!-- Campo oculto para guardar o ID da tarefa sendo editada -->
+                <input type="hidden" id="editTaskId">
+
+                <div class="form-group">
+                    <label for="editTitle">Título</label>
+                    <input type="text" id="editTitle" required maxlength="100">
+                </div>
+
+                <div class="form-row form-row-options">
+                    <div class="form-group">
+                        <label for="editCategory">Categoria</label>
+                        <select id="editCategory">
+                            <option value="pessoal">🏠 Pessoal</option>
+                            <option value="trabalho">💼 Trabalho</option>
+                            <option value="estudos">📚 Estudos</option>
+                            <option value="saude">💪 Saúde</option>
+                            <option value="financas">💰 Finanças</option>
+                            <option value="outros">📌 Outros</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editPriority">Prioridade</label>
+                        <select id="editPriority">
+                            <option value="baixa">🟢 Baixa</option>
+                            <option value="media">🟡 Média</option>
+                            <option value="alta">🔴 Alta</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editDate">Prazo</label>
+                        <input type="date" id="editDate">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="editDescription">Descrição</label>
+                    <textarea id="editDescription" rows="3" maxlength="300"></textarea>
+                </div>
+
+                <button type="submit" class="btn-add">
+                    <span class="btn-icon">💾</span>
+                    <span class="btn-text">Salvar Alterações</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         MODAL DE CONFIRMAÇÃO - Popup para confirmar exclusão de tarefa
+         ============================================================ -->
+    <div class="modal-overlay" id="confirmModal">
+        <div class="modal-content modal-confirm">
+            <div class="confirm-icon">⚠️</div>
+            <h3>Tem certeza?</h3>
+            <p>Esta ação não pode ser desfeita.</p>
+            <div class="confirm-buttons">
+                <button class="btn-cancel" id="btnCancelDelete">Cancelar</button>
+                <button class="btn-delete-confirm" id="btnConfirmDelete">Excluir</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         NOTIFICAÇÃO TOAST - Mensagem temporária de feedback
+         Aparece no canto ao realizar ações (adicionar, editar, excluir)
+         ============================================================ -->
+    <div class="toast" id="toast">
+        <span class="toast-icon" id="toastIcon">✅</span>
+        <span class="toast-message" id="toastMessage">Ação realizada!</span>
+    </div>
+
+    <!-- ============================================================
+         SCRIPT JAVASCRIPT - Carregado no final do body para garantir
+         que todos os elementos HTML já existam antes do JS executar
+         ============================================================ -->
+    <script src="app.js"></script>
+</body>
+</html>

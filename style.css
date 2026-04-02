@@ -1,0 +1,1157 @@
+/* ================================================================
+   STYLE.CSS - Estilos do ToDo List Inteligente
+   
+   ESTRUTURA DESTE ARQUIVO:
+   1. Reset & Variáveis CSS (cores, fontes, tamanhos reutilizáveis)
+   2. Estilos Globais (body, container principal)
+   3. Header (cabeçalho + cards de estatísticas)
+   4. Formulário de Nova Tarefa
+   5. Barra de Controles (busca, filtros, ordenação)
+   6. Cards de Tarefas (cada item da lista)
+   7. Modal de Edição
+   8. Modal de Confirmação
+   9. Toast (notificações temporárias)
+   10. Animações
+   11. Responsividade (adaptação para telas menores)
+   ================================================================ */
+
+
+/* ================================================================
+   1. RESET & VARIÁVEIS CSS
+   ================================================================ */
+
+/* 
+   RESET UNIVERSAL
+   - Remove margens e paddings padrão de TODOS os elementos
+   - box-sizing: border-box faz com que padding e border sejam
+     incluídos no tamanho total do elemento (facilita cálculos)
+*/
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/*
+   VARIÁVEIS CSS (Custom Properties)
+   - Definidas no :root (elemento raiz = <html>)
+   - Podem ser reutilizadas em QUALQUER lugar do CSS usando var(--nome)
+   - Facilitam manutenção: muda em um lugar, atualiza em todos
+*/
+:root {
+    /* === CORES PRINCIPAIS === */
+    /* Fundo escuro com três tons para criar profundidade */
+    --bg-primary: #0f0f1a;        /* Fundo principal (mais escuro) */
+    --bg-secondary: #1a1a2e;      /* Fundo dos cards/seções */
+    --bg-tertiary: #252540;       /* Fundo de inputs e elementos interativos */
+    
+    /* Cores de texto */
+    --text-primary: #e8e8f0;      /* Texto principal (branco suave) */
+    --text-secondary: #8888a0;    /* Texto secundário (cinza) */
+    --text-muted: #55556a;        /* Texto apagado (dicas, placeholders) */
+    
+    /* Cor de destaque/acento (roxo vibrante) */
+    --accent: #7c5cfc;            /* Cor principal de destaque */
+    --accent-hover: #6a4de8;      /* Cor ao passar o mouse */
+    --accent-glow: rgba(124, 92, 252, 0.3); /* Brilho/sombra da cor de destaque */
+    
+    /* Cores de prioridade (usadas nos badges e bordas dos cards) */
+    --priority-low: #4ecdc4;      /* Verde-água para prioridade baixa */
+    --priority-medium: #ffd93d;   /* Amarelo para prioridade média */
+    --priority-high: #ff6b6b;     /* Vermelho para prioridade alta */
+    
+    /* Cores de status */
+    --success: #4ecdc4;           /* Verde para ações bem-sucedidas */
+    --danger: #ff6b6b;            /* Vermelho para ações destrutivas */
+    --warning: #ffd93d;           /* Amarelo para avisos */
+    
+    /* === BORDAS E SOMBRAS === */
+    --border-color: rgba(255, 255, 255, 0.06);  /* Borda sutil e transparente */
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);  /* Sombra pequena */
+    --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.3); /* Sombra média */
+    --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.4); /* Sombra grande */
+    
+    /* === TIPOGRAFIA === */
+    --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    
+    /* === ESPAÇAMENTOS === */
+    --radius-sm: 8px;             /* Borda arredondada pequena */
+    --radius-md: 12px;            /* Borda arredondada média */
+    --radius-lg: 16px;            /* Borda arredondada grande */
+    --radius-xl: 20px;            /* Borda arredondada extra grande */
+    
+    /* === TRANSIÇÕES === */
+    --transition-fast: 0.2s ease;  /* Transição rápida (hover, etc.) */
+    --transition-normal: 0.3s ease; /* Transição normal */
+    --transition-slow: 0.5s ease;  /* Transição lenta (modais, etc.) */
+}
+
+
+/* ================================================================
+   2. ESTILOS GLOBAIS
+   ================================================================ */
+
+/*
+   BODY - Configurações do corpo da página
+   - min-height: 100vh garante que ocupe toda a altura da tela
+   - O gradiente de fundo vai do canto superior esquerdo ao inferior direito
+*/
+body {
+    font-family: var(--font-family);
+    background: var(--bg-primary);
+    /* Gradiente sutil no fundo para dar profundidade visual */
+    background-image: 
+        radial-gradient(ellipse at 20% 0%, rgba(124, 92, 252, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 100%, rgba(78, 205, 196, 0.05) 0%, transparent 50%);
+    color: var(--text-primary);
+    min-height: 100vh;
+    line-height: 1.6;
+    /* Suaviza as fontes no macOS/iOS */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/*
+   CONTAINER PRINCIPAL
+   - max-width limita a largura para melhor legibilidade
+   - margin: 0 auto centraliza horizontalmente
+   - padding adiciona espaço interno nas laterais
+*/
+.app-container {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 30px 20px 60px;
+}
+
+
+/* ================================================================
+   3. HEADER - Cabeçalho com título e estatísticas
+   ================================================================ */
+
+.app-header {
+    margin-bottom: 30px;
+}
+
+.header-top {
+    display: flex;                    /* Flexbox para alinhar itens lado a lado */
+    justify-content: space-between;  /* Espaço entre título e data */
+    align-items: center;             /* Centraliza verticalmente */
+    margin-bottom: 24px;
+    flex-wrap: wrap;                 /* Quebra linha em telas pequenas */
+    gap: 10px;
+}
+
+/* Título principal com gradiente de texto */
+.app-header h1 {
+    font-size: 1.8rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Ícone do logo com fundo roxo e brilho */
+.logo-icon {
+    font-size: 1.6rem;
+    /* Aplica um filtro de sombra colorida ao emoji */
+    filter: drop-shadow(0 0 8px var(--accent-glow));
+}
+
+/* 
+   Texto "Inteligente" com gradiente 
+   - background: gradiente define as cores
+   - -webkit-background-clip: text faz o gradiente aparecer só no texto
+   - color: transparent torna a cor original invisível para o gradiente aparecer
+*/
+.logo-accent {
+    background: linear-gradient(135deg, var(--accent), var(--priority-low));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Data atual no canto superior direito */
+.current-date {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+/* 
+   BARRA DE ESTATÍSTICAS
+   - display: grid cria um grid de 4 colunas iguais
+   - repeat(4, 1fr) = 4 colunas com fração igual do espaço
+*/
+.stats-bar {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+/* 
+   CARD DE ESTATÍSTICA
+   - Efeito "glassmorphism" (vidro fosco) com backdrop-filter
+   - backdrop-filter: blur() desfoca o fundo atrás do elemento
+*/
+.stat-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    text-align: center;
+    transition: var(--transition-fast);
+    /* Borda superior colorida como indicador visual */
+    border-top: 3px solid var(--accent);
+}
+
+/* Efeito hover: eleva o card levemente */
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Variações de cor para cada tipo de estatística */
+.stat-card.stat-pending {
+    border-top-color: var(--priority-medium);
+}
+.stat-card.stat-completed {
+    border-top-color: var(--success);
+}
+.stat-card.stat-urgent {
+    border-top-color: var(--danger);
+}
+
+/* Número grande dentro do card */
+.stat-number {
+    display: block;
+    font-size: 1.8rem;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 4px;
+}
+
+/* Label descritivo abaixo do número */
+.stat-label {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+
+/* ================================================================
+   4. FORMULÁRIO DE NOVA TAREFA
+   ================================================================ */
+
+/* Seção do formulário com fundo e borda arredondada */
+.add-task-section {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-xl);
+    padding: 24px;
+    margin-bottom: 20px;
+}
+
+/* Título da seção */
+.section-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* 
+   LAYOUT DO FORMULÁRIO
+   - Cada .form-row é uma linha horizontal
+   - gap controla o espaço entre os elementos
+*/
+.task-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.form-row {
+    display: flex;
+    gap: 12px;
+}
+
+/* Linha de opções (categoria, prioridade, data) em grid de 3 colunas */
+.form-row-options {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+/* Grupo de formulário (label + input) */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+/* O grupo do título ocupa toda a largura disponível */
+.form-group-title {
+    flex: 1;
+}
+
+/* Label dos campos */
+.form-group label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* 
+   ESTILOS DOS INPUTS, SELECTS E TEXTAREA
+   - appearance: none remove o estilo padrão do navegador
+   - Todos compartilham o mesmo visual para consistência
+*/
+.form-group input,
+.form-group select,
+.form-group textarea {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    color: var(--text-primary);
+    font-family: var(--font-family);
+    font-size: 0.95rem;
+    transition: var(--transition-fast);
+    outline: none;              /* Remove a borda azul padrão do foco */
+    width: 100%;
+}
+
+/* Textarea não pode ser redimensionado horizontalmente */
+.form-group textarea {
+    resize: vertical;
+}
+
+/*
+   FOCO nos inputs - quando o usuário clica/taba no campo
+   - Borda fica roxa (cor de destaque)
+   - box-shadow cria um brilho ao redor (efeito "glow")
+*/
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+/* Estilo do placeholder (texto dica dentro do input) */
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+    color: var(--text-muted);
+}
+
+/* 
+   BOTÃO DE ADICIONAR TAREFA
+   - Gradiente roxo como fundo
+   - Cursor pointer indica que é clicável
+*/
+.btn-add {
+    background: linear-gradient(135deg, var(--accent), #5a3fd4);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 14px 24px;
+    font-family: var(--font-family);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: var(--transition-fast);
+    width: 100%;
+}
+
+/* Hover: escurece um pouco e eleva o botão */
+.btn-add:hover {
+    background: linear-gradient(135deg, var(--accent-hover), #4e35c0);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px var(--accent-glow);
+}
+
+/* Active (clicando): botão desce um pouco para dar feedback tátil */
+.btn-add:active {
+    transform: translateY(0);
+}
+
+
+/* ================================================================
+   5. BARRA DE CONTROLES (Busca, Filtros, Ordenação)
+   ================================================================ */
+
+.controls-section {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 20px;
+    align-items: center;
+}
+
+/* 
+   BARRA DE BUSCA
+   - position: relative permite posicionar o ícone dentro do input
+*/
+.search-bar {
+    flex: 1;
+    min-width: 200px;
+    position: relative;
+}
+
+/* Ícone de lupa posicionado dentro do input à esquerda */
+.search-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);    /* Centraliza verticalmente */
+    font-size: 1rem;
+    pointer-events: none;           /* Cliques passam através do ícone */
+}
+
+/* Input de busca com padding extra à esquerda para o ícone */
+.search-bar input {
+    width: 100%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 12px 16px 12px 44px;   /* 44px à esquerda = espaço para o ícone */
+    color: var(--text-primary);
+    font-family: var(--font-family);
+    font-size: 0.9rem;
+    transition: var(--transition-fast);
+    outline: none;
+}
+
+.search-bar input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.search-bar input::placeholder {
+    color: var(--text-muted);
+}
+
+/* 
+   GRUPO DE FILTROS
+   - Botões lado a lado para filtrar por status
+*/
+.filter-group {
+    display: flex;
+    gap: 4px;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+    padding: 4px;
+    border: 1px solid var(--border-color);
+}
+
+/* Botão de filtro individual */
+.filter-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    padding: 8px 16px;
+    border-radius: var(--radius-md);
+    font-family: var(--font-family);
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+
+/* Hover: texto fica mais claro */
+.filter-btn:hover {
+    color: var(--text-primary);
+}
+
+/* 
+   Filtro ATIVO - o botão selecionado atualmente
+   - Fundo roxo para indicar a seleção
+*/
+.filter-btn.active {
+    background: var(--accent);
+    color: white;
+    font-weight: 600;
+}
+
+/* GRUPO DE ORDENAÇÃO */
+.sort-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sort-group label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+    white-space: nowrap;            /* Impede quebra de linha no label */
+}
+
+.sort-group select {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    padding: 8px 12px;
+    color: var(--text-primary);
+    font-family: var(--font-family);
+    font-size: 0.85rem;
+    outline: none;
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+
+.sort-group select:focus {
+    border-color: var(--accent);
+}
+
+
+/* ================================================================
+   6. CARDS DE TAREFAS
+   ================================================================ */
+
+/* Container da lista (flexbox vertical) */
+.tasks-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* 
+   CARD INDIVIDUAL DE TAREFA
+   - Cada tarefa é um card com informações e ações
+   - border-left com 4px de cor indica a prioridade visualmente
+*/
+.task-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 18px;
+    /* Borda esquerda colorida baseada na prioridade (definida inline via JS) */
+    border-left: 4px solid var(--accent);
+    transition: var(--transition-normal);
+    /* Animação de entrada: aparece deslizando de cima */
+    animation: slideIn 0.3s ease;
+}
+
+/* Hover: eleva e mostra sombra */
+.task-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Variação para cada prioridade (borda esquerda colorida) */
+.task-card.priority-baixa {
+    border-left-color: var(--priority-low);
+}
+.task-card.priority-media {
+    border-left-color: var(--priority-medium);
+}
+.task-card.priority-alta {
+    border-left-color: var(--priority-high);
+}
+
+/* 
+   TAREFA CONCLUÍDA
+   - Opacidade reduzida para "desfocar" visualmente
+*/
+.task-card.completed {
+    opacity: 0.6;
+}
+
+/* Texto riscado quando a tarefa está concluída */
+.task-card.completed .task-title {
+    text-decoration: line-through;
+    color: var(--text-secondary);
+}
+
+/* Layout interno do card: dividido em 3 partes */
+.task-card-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+}
+
+/* 
+   CHECKBOX CUSTOMIZADO
+   - Escondemos o checkbox nativo e criamos um próprio com CSS
+*/
+.task-checkbox {
+    /* Esconde o checkbox padrão do navegador */
+    appearance: none;
+    -webkit-appearance: none;
+    width: 22px;
+    height: 22px;
+    min-width: 22px;
+    border: 2px solid var(--text-muted);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: var(--transition-fast);
+    position: relative;
+    margin-top: 2px;
+}
+
+/* Hover no checkbox: borda fica roxa */
+.task-checkbox:hover {
+    border-color: var(--accent);
+}
+
+/* 
+   Checkbox MARCADO (checked)
+   - Fundo e borda ficam roxos
+*/
+.task-checkbox:checked {
+    background: var(--accent);
+    border-color: var(--accent);
+}
+
+/* 
+   Ícone de "check" (✓) dentro do checkbox
+   - Criado com ::after pseudo-elemento
+   - Desenhado com bordas CSS (truque clássico!)
+*/
+.task-checkbox:checked::after {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 2px;
+    width: 6px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    /* Rotaciona 45° para formar o "L" que parece um ✓ */
+    transform: rotate(45deg);
+}
+
+/* Área de conteúdo da tarefa (título, badges, descrição) */
+.task-content {
+    flex: 1;
+    min-width: 0;                   /* Permite text-overflow funcionar */
+}
+
+/* Título da tarefa */
+.task-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    line-height: 1.4;
+    word-break: break-word;         /* Quebra palavras muito longas */
+}
+
+/* Linha de badges (categoria, prioridade, prazo) */
+.task-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 8px;
+}
+
+/* 
+   BADGE - Pequena etiqueta colorida
+   - Mostra categoria, prioridade ou prazo da tarefa
+*/
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 20px;            /* Totalmente arredondado = "pill shape" */
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+/* Variações de cor dos badges */
+.badge-category {
+    background: rgba(124, 92, 252, 0.15);
+    color: var(--accent);
+}
+.badge-priority-baixa {
+    background: rgba(78, 205, 196, 0.15);
+    color: var(--priority-low);
+}
+.badge-priority-media {
+    background: rgba(255, 217, 61, 0.15);
+    color: var(--priority-medium);
+}
+.badge-priority-alta {
+    background: rgba(255, 107, 107, 0.15);
+    color: var(--priority-high);
+}
+.badge-date {
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text-secondary);
+}
+/* Badge de prazo vencido */
+.badge-overdue {
+    background: rgba(255, 107, 107, 0.15);
+    color: var(--danger);
+}
+
+/* Descrição da tarefa */
+.task-description {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin-bottom: 4px;
+}
+
+/* Botões de ação (editar, excluir) */
+.task-actions {
+    display: flex;
+    gap: 6px;
+    margin-left: auto;
+    flex-shrink: 0;                 /* Impede que os botões encolham */
+}
+
+/* Botão de ação individual (ícone) */
+.btn-action {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    padding: 8px 10px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: var(--transition-fast);
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-action:hover {
+    border-color: var(--accent);
+    color: var(--text-primary);
+    transform: translateY(-1px);
+}
+
+/* Hover específico para botão de excluir: fica vermelho */
+.btn-action.btn-delete:hover {
+    border-color: var(--danger);
+    color: var(--danger);
+    background: rgba(255, 107, 107, 0.1);
+}
+
+
+/* ================================================================
+   7. ESTADO VAZIO (quando não há tarefas)
+   ================================================================ */
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-muted);
+}
+
+/* Ícone grande centralizado */
+.empty-icon {
+    font-size: 4rem;
+    margin-bottom: 16px;
+    /* Animação de flutuação contínua */
+    animation: float 3s ease-in-out infinite;
+}
+
+.empty-state h3 {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+}
+
+.empty-state p {
+    font-size: 0.9rem;
+}
+
+
+/* ================================================================
+   8. BARRA DE AÇÕES (Limpar Concluídas)
+   ================================================================ */
+
+.actions-bar {
+    text-align: center;
+    margin-top: 16px;
+}
+
+/* Botão de limpar concluídas */
+.btn-clear {
+    background: transparent;
+    border: 1px solid rgba(255, 107, 107, 0.3);
+    color: var(--danger);
+    border-radius: var(--radius-sm);
+    padding: 10px 20px;
+    font-family: var(--font-family);
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+
+.btn-clear:hover {
+    background: rgba(255, 107, 107, 0.1);
+    border-color: var(--danger);
+}
+
+
+/* ================================================================
+   9. MODAIS (Edição e Confirmação)
+   ================================================================ */
+
+/* 
+   OVERLAY do modal - Camada escura atrás do modal
+   - position: fixed cobre toda a tela
+   - z-index alto garante que fica por cima de tudo
+   - display: none esconde por padrão
+*/
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    /* backdrop-filter: blur desfoca o conteúdo atrás do modal */
+    backdrop-filter: blur(4px);
+    display: none;                  /* Escondido por padrão */
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    padding: 20px;
+}
+
+/* 
+   Quando o modal está ativo (classe .active), mostramos com display: flex 
+   e adicionamos uma animação de fade-in
+*/
+.modal-overlay.active {
+    display: flex;
+    animation: fadeIn 0.3s ease;
+}
+
+/* Conteúdo do modal */
+.modal-content {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-xl);
+    padding: 30px;
+    width: 100%;
+    max-width: 520px;
+    /* Animação de escala: aparece crescendo de 95% para 100% */
+    animation: scaleIn 0.3s ease;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+/* Cabeçalho do modal (título + botão fechar) */
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.modal-header h2 {
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+/* Botão X de fechar o modal */
+.modal-close {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 1.8rem;
+    cursor: pointer;
+    padding: 0 4px;
+    line-height: 1;
+    transition: var(--transition-fast);
+}
+
+.modal-close:hover {
+    color: var(--text-primary);
+    transform: rotate(90deg);       /* Rotaciona 90° no hover - detalhe legal */
+}
+
+/* MODAL DE CONFIRMAÇÃO */
+.modal-confirm {
+    text-align: center;
+    max-width: 380px;
+}
+
+.confirm-icon {
+    font-size: 3rem;
+    margin-bottom: 16px;
+}
+
+.modal-confirm h3 {
+    font-size: 1.2rem;
+    margin-bottom: 8px;
+}
+
+.modal-confirm p {
+    color: var(--text-secondary);
+    margin-bottom: 24px;
+}
+
+/* Botões de confirmação (Cancelar / Excluir) */
+.confirm-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+/* Botão Cancelar */
+.btn-cancel {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    border-radius: var(--radius-sm);
+    padding: 10px 24px;
+    font-family: var(--font-family);
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+
+.btn-cancel:hover {
+    background: var(--bg-primary);
+}
+
+/* Botão Confirmar Exclusão */
+.btn-delete-confirm {
+    background: var(--danger);
+    border: none;
+    color: white;
+    border-radius: var(--radius-sm);
+    padding: 10px 24px;
+    font-family: var(--font-family);
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+
+.btn-delete-confirm:hover {
+    background: #e05555;
+    transform: translateY(-1px);
+}
+
+
+/* ================================================================
+   10. TOAST (Notificações temporárias)
+   ================================================================ */
+
+/*
+   Toast = pequena mensagem que aparece temporariamente
+   - Posição fixa no canto inferior direito
+   - transform: translateX(120%) esconde para fora da tela
+   - Quando recebe .show, desliza para dentro
+*/
+.toast {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: var(--shadow-lg);
+    transform: translateX(120%);    /* Escondido fora da tela */
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 2000;
+}
+
+/* Quando tem a classe .show, desliza para dentro da tela */
+.toast.show {
+    transform: translateX(0);
+}
+
+.toast-icon {
+    font-size: 1.2rem;
+}
+
+.toast-message {
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+
+/* ================================================================
+   11. ANIMAÇÕES (Keyframes)
+   ================================================================ */
+
+/* Animação de SLIDE IN - Tarefa aparece deslizando de cima */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Animação de SLIDE OUT - Tarefa desaparece deslizando para a direita */
+@keyframes slideOut {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(100px);
+    }
+}
+
+/* Animação de FADE IN - Aparecimento suave */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Animação de SCALE IN - Modal aparece crescendo */
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Animação de FLUTUAÇÃO - Para o ícone do estado vazio */
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+/* Classe utilitária para efeito de remoção */
+.removing {
+    animation: slideOut 0.3s ease forwards;
+}
+
+
+/* ================================================================
+   12. RESPONSIVIDADE - Adaptação para telas menores
+   ================================================================ */
+
+/* 
+   MEDIA QUERIES
+   - @media (max-width: Xpx) aplica estilos APENAS quando a tela 
+     tem largura igual ou menor que X pixels
+*/
+
+/* Tablets e telas médias (até 768px) */
+@media (max-width: 768px) {
+    .app-header h1 {
+        font-size: 1.4rem;
+    }
+
+    /* Stats: de 4 colunas para 2 colunas */
+    .stats-bar {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    /* Opções do formulário: de 3 colunas para 1 coluna */
+    .form-row-options {
+        grid-template-columns: 1fr;
+    }
+
+    /* Controles empilham verticalmente */
+    .controls-section {
+        flex-direction: column;
+    }
+
+    .search-bar {
+        min-width: 100%;
+    }
+
+    .filter-group {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .sort-group {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* Celulares (até 480px) */
+@media (max-width: 480px) {
+    .app-container {
+        padding: 16px 12px 40px;
+    }
+
+    .app-header h1 {
+        font-size: 1.2rem;
+    }
+
+    .add-task-section {
+        padding: 16px;
+    }
+
+    .task-card {
+        padding: 14px;
+    }
+
+    /* Botões de ação ficam na parte inferior do card */
+    .task-card-top {
+        flex-wrap: wrap;
+    }
+
+    .task-actions {
+        width: 100%;
+        justify-content: flex-end;
+        margin-top: 10px;
+    }
+
+    /* Toast ocupa mais espaço em telas pequenas */
+    .toast {
+        left: 16px;
+        right: 16px;
+        bottom: 16px;
+    }
+}
+
+
+/* ================================================================
+   SCROLLBAR CUSTOMIZADA
+   - Personaliza a barra de rolagem para combinar com o tema dark
+   ================================================================ */
+
+/* Para navegadores baseados em Chromium (Chrome, Edge, Brave, etc.) */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--bg-tertiary);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
+}
